@@ -1,5 +1,7 @@
 package com.learn.camel;
 
+import java.util.Map;
+
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -50,14 +52,24 @@ Aggregator then waits based on the completion condition you define (e.g., timeou
 		InterruptedException ignored) {
 		}
 		
-		
+		log.info("#################################Scatter  & Aggregator  ############################################");
 		Object response = producerTemplate.requestBody("direct:return-request", "ReturnRequest#123");
 		log.info("Aggregated Return Result: {}" , response);
 		
 		response = producerTemplate.requestBody("direct:return-request", "ReturnRequest#VIP");
 		log.info("Aggregated Return Result: {}" , response);
 		
+		log.info("#################################Only From & To ############################################");
+		
 		response = producerTemplate.requestBody("direct:return-request-reason", "ReturnID:123, Product:ABC, Reason:Damaged");
-		log.info("Return Return Result: {}" , response);
+		log.info("Return From & To Result: {}" , response);
+
+		Map<String, Object> headers = Map.of("ReturnID", "R4567", "ProductCode", "SKU-1234");
+		String body = "Reason: Broken screen";
+
+		log.info("#################################Process  & Exchange ############################################");
+		
+		response = producerTemplate.requestBodyAndHeaders("direct:return-exchange", body, headers);
+		log.info("Return Exchange Result: {}", response);
 	}
 }
