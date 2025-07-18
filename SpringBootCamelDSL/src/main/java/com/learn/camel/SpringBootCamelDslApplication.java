@@ -33,6 +33,11 @@ Customer Return Request --> [Scatter] -->
                Final response: Return Completed
 
 
+🚦 In a Parallel Processing Scenario (e.g., with .split().parallelProcessing())
+When you use .split().parallelProcessing() followed by .aggregate(), each split part is processed in parallel.
+
+Aggregator then waits based on the completion condition you define (e.g., timeout, size, custom predicate).
+
 	 */
 
 	@Override
@@ -51,5 +56,8 @@ Customer Return Request --> [Scatter] -->
 		
 		response = producerTemplate.requestBody("direct:return-request", "ReturnRequest#VIP");
 		log.info("Aggregated Return Result: {}" , response);
+		
+		response = producerTemplate.requestBody("direct:return-request-reason", "ReturnID:123, Product:ABC, Reason:Damaged");
+		log.info("Return Return Result: {}" , response);
 	}
 }
