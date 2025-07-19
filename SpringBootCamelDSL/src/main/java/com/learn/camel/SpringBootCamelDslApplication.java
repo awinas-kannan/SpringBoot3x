@@ -71,5 +71,11 @@ Aggregator then waits based on the completion condition you define (e.g., timeou
 		
 		response = producerTemplate.requestBodyAndHeaders("direct:return-exchange", body, headers);
 		log.info("Return Exchange Result: {}", response);
+		
+		log.info("#################################Process  & Choice ############################################");
+		
+		producerTemplate.sendBody("direct:return-multi-process", "ReturnID=101,type=damaged");
+		producerTemplate.sendBody("direct:return-multi-process", "ReturnID=102,type=expired");
+		producerTemplate.sendBody("direct:return-multi-process", "ReturnID=103,type=unwanted");
 	}
 }
