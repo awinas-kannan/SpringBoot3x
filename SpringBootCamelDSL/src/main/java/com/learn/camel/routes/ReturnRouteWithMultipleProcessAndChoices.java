@@ -4,12 +4,14 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.learn.camel.service.predicates.DamagedPredicate;
 import com.learn.camel.service.predicates.ReturnTypePredicate;
 import com.learn.camel.service.process.DamagedReturnProcessor;
 
 @Component
 public class ReturnRouteWithMultipleProcessAndChoices extends RouteBuilder {
 
+	@Autowired DamagedPredicate damagedPredicate;
 	@Autowired DamagedReturnProcessor damagedReturnProcessor;
 	
     @Override
@@ -21,7 +23,7 @@ public class ReturnRouteWithMultipleProcessAndChoices extends RouteBuilder {
             .process("returnValidator")
 
             .choice()
-                .when(method(ReturnTypePredicate.class, "isDamaged"))
+                .when(damagedPredicate)
                     .process(damagedReturnProcessor)
                 .when(method(ReturnTypePredicate.class, "isExpired"))
                     .process("expiredReturnProcessor")
