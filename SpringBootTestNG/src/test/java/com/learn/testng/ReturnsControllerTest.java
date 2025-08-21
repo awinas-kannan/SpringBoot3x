@@ -14,7 +14,7 @@ import org.testng.annotations.*;
 import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ReturnsControllerTest extends AbstractTestNGSpringContextTests  {
+public class ReturnsControllerTest extends AbstractTestNGSpringContextTests {
 
     private static ExtentReports extent;
     private static ExtentTest test;
@@ -40,53 +40,49 @@ public class ReturnsControllerTest extends AbstractTestNGSpringContextTests  {
         baseUrl = "http://localhost:" + port + "/api/returns";
     }
 
-    @Test(priority = 1)
-    public void testReturnEligibility() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(baseUrl + "/eligibility/ELIGIBLE123", String.class);
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-        test.pass("Eligibility check passed: " + response.getBody());
+    @Test
+    public void testCheckEligibility() {
+        String response = restTemplate.getForObject(baseUrl + "/eligibility/ORD123", String.class);
+        test.info("Response: " + response);
+        Assert.assertEquals(response, "Eligible for return");
+        test.pass("Eligibility check passed");
     }
 
-    @Test(priority = 2)
-    public void testReturnReasons() {
-        ResponseEntity<List> response =
-                restTemplate.getForEntity(baseUrl + "/reasons", List.class);
-        Assert.assertTrue(response.getBody().contains("Damaged"));
-        test.pass("Return reasons retrieved successfully: " + response.getBody());
+    @Test
+    public void testGetReturnReasons() {
+        String[] reasons = restTemplate.getForObject(baseUrl + "/reasons", String[].class);
+        test.info("Reasons: " + String.join(", ", reasons));
+        Assert.assertTrue(reasons.length > 0);
+        test.pass("Fetched return reasons successfully");
     }
 
-    @Test(priority = 3)
-    public void testDispositionPath() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(baseUrl + "/disposition/ITEM123", String.class);
-
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-        test.pass("Disposition retrieved successfully: " + response.getBody());
+    @Test
+    public void testGetDisposition() {
+        String disposition = restTemplate.getForObject(baseUrl + "/disposition/ITEM200", String.class);
+        test.info("Disposition: " + disposition);
+        Assert.assertEquals(disposition, "Resell in Store");
+        test.pass("Disposition path verified");
     }
-    @Test(priority = 4)
+
+    @Test
     public void testCreateReturn() {
         Map<String, Object> request = new HashMap<>();
-        request.put("orderId", "ELIGIBLE123");
-        request.put("reason", "Damaged");
+        request.put("orderId", "ORD123");
+        request.put("reason", "Damaged Item");
 
-        ResponseEntity<String> response =
-                restTemplate.postForEntity(baseUrl + "/create", request, String.class);
-
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-        test.pass("Return created successfully: " + response.getBody());
+        String response = restTemplate.postForObject(baseUrl + "/create", request, String.class);
+        test.info("Response: " + response);
+        Assert.assertTrue(response.contains("ORD123"));
+        test.pass("Return creation successful");
     }
 
-    @Test(priority = 5)
-    public void testRefundComputation() {
-        ResponseEntity<Double> response =
-                restTemplate.getForEntity(baseUrl + "/refund/ELIGIBLE123", Double.class);
-
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-        Assert.assertTrue(response.getBody() > 0);
-        test.pass("Refund computed successfully: " + response.getBody());
+    @Test
+    public void testComputeRefund() {
+        Double refund = restTemplate.getForObject(baseUrl + "/refund/ORD456", Double.class);
+        test.info("Refund: " + refund);
+        Assert.assertEquals(refund, 225.0);
+        test.pass("Refund computed correctly");
     }
-
 
 
     @AfterSuite
