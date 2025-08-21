@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="RetailCartSuite">
+    <test name="CartAPITests">
+        <classes>
+            <class name="com.learn.testng.CartControllerTest"/>
+        </classes>
+    </test>
+</suite>
