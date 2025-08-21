@@ -3,7 +3,7 @@ package com.learn.testng;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
-public class AnnotationOrderDemo {
+public class AnnotationOrderDemoTest {
 
     @BeforeSuite
     public void beforeSuite() {
@@ -37,7 +37,7 @@ public class AnnotationOrderDemo {
 
     @DataProvider(name = "cartData")
     public Object[][] cartData() {
-        System.out.println(">> DataProvider cartData");
+        System.out.println(">> DataProvider cartData. Executed before the tests that uses this provider >>");
         return new Object[][]{
                 {"ITEM1001", 2},
                 {"ITEM1002", 3},
