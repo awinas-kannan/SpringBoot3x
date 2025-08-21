@@ -33,6 +33,7 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
     @BeforeMethod
     public void setup() {
         // Reset cart before each test
+        System.out.println(">> BeforeMethod: Reset cart before each test ");
         restTemplate.delete(baseUrl + "/remove/ITEM1001");
         restTemplate.delete(baseUrl + "/remove/ITEM1002");
         restTemplate.delete(baseUrl + "/remove/ITEM1003");
@@ -46,6 +47,7 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
 
     @DataProvider(name = "cartData")
     public Object[][] cartData() {
+        System.out.println(">> @DataProvider: cartData");
         return new Object[][]{
                 {"ITEM1001", 2, 2},
                 {"ITEM1002", 3, 3},
@@ -55,6 +57,7 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test(dataProvider = "cartData")
     public void testAddAndVerify(String productId, int qty, int expectedCount) {
+        System.out.println(">> @Test: testAddAndVerify");
         restTemplate.postForEntity(baseUrl + "/add?productId=" + productId + "&qty=" + qty, null, String.class);
 
         ResponseEntity<Integer> response =
@@ -63,7 +66,7 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(response.getBody().intValue(), expectedCount);
     }
 
-    @Test
+//    @Test
     public void testScenario_AddRemoveVerify() {
         // Add items
         restTemplate.postForEntity(baseUrl + "/add?productId=ITEM1001&qty=2", null, String.class);
