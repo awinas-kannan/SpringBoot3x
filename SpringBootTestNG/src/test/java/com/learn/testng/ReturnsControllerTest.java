@@ -30,8 +30,12 @@ public class ReturnsControllerTest extends AbstractTestNGSpringContextTests {
     @BeforeSuite
     public void setupReport() {
         ExtentSparkReporter reporter = new ExtentSparkReporter("src/test/resources/reports/returns-extent-report.html");
+        reporter.config().setReportName("Walmart Returns Automation Report");
+        reporter.config().setDocumentTitle("Returns Testing");
         extent = new ExtentReports();
         extent.attachReporter(reporter);
+        extent.setSystemInfo("Tester", "Awinas Kannan");
+        extent.setSystemInfo("Environment", "QA");
     }
 
     @BeforeClass
