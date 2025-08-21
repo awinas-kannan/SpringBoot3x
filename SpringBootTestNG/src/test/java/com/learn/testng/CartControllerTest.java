@@ -1,5 +1,9 @@
 package com.learn.testng;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -7,11 +11,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
+
+import java.lang.reflect.Method;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CartControllerTest extends AbstractTestNGSpringContextTests {
@@ -22,7 +24,17 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    private static ExtentReports extent;
+    private ExtentTest test;
+
     private String baseUrl;
+
+    @BeforeSuite
+    public void setupReport() {
+        ExtentSparkReporter reporter = new ExtentSparkReporter("src/test/resources/reports/testng-cart-report.html");
+        extent = new ExtentReports();
+        extent.attachReporter(reporter);
+    }
 
     @BeforeClass
     public void beforeClass() {
@@ -31,7 +43,9 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
     }
 
     @BeforeMethod
-    public void setup() {
+    public void setup(Method method) {
+        test = extent.createTest(method.getName()); // Create a test node per method
+        test.log(Status.INFO, "Starting test: " + method.getName());
         // Reset cart before each test
         System.out.println(">> BeforeMethod: Reset cart before each test ");
         restTemplate.delete(baseUrl + "/remove/ITEM1001");
@@ -44,6 +58,10 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
         ResponseEntity<Integer> resp = restTemplate.getForEntity(baseUrl + "/total", Integer.class);
         System.out.println(">> @AfterMethod: Cart total items = " + resp.getBody());
     }
+
+    /*
+     *   testAddAndVerify will be exected for each of the data returned from provider
+     */
 
     @DataProvider(name = "cartData")
     public Object[][] cartData() {
@@ -66,7 +84,7 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(response.getBody().intValue(), expectedCount);
     }
 
-//    @Test
+    //    @Test
     public void testScenario_AddRemoveVerify() {
         // Add items
         restTemplate.postForEntity(baseUrl + "/add?productId=ITEM1001&qty=2", null, String.class);
@@ -86,5 +104,10 @@ public class CartControllerTest extends AbstractTestNGSpringContextTests {
         // Verify total = 3
         ResponseEntity<Integer> totalAfter = restTemplate.getForEntity(baseUrl + "/total", Integer.class);
         Assert.assertEquals(totalAfter.getBody().intValue(), 3);
+    }
+
+    @AfterSuite
+    public void tearDownReport() {
+        extent.flush();
     }
 }
