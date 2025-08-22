@@ -2,7 +2,10 @@
 <suite name="RetailCartSuite">
     <test name="CartAPITests">
         <classes>
+            <class name="com.learn.testng.AnnotationOrderDemoTest"/>
             <class name="com.learn.testng.CartControllerTest"/>
+            <class name="com.learn.testng.ReturnsControllerTest"/>
+            <class name="com.learn.testng.ReturnsControllerV2Test"/>
         </classes>
     </test>
 </suite>
